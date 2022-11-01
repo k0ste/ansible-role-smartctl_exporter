@@ -1,0 +1,6 @@
+---
+smartctl_exporter_dest: '/opt/smartctl_exporter'
+smartctl_exporter_service: 'smartctl_exporter'
+smartctl_exporter_url:
+  'https://github.com/prometheus-community/smartctl_exporter/releases/download'
+smartctl_exporter_arch: 'linux-amd64'

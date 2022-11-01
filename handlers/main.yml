@@ -1,0 +1,19 @@
+---
+- name: "Daemon reload"
+  ansible.builtin.systemd:
+    daemon_reload: "yes"
+- name: "Restart smartctl_exporter"
+  ansible.builtin.systemd:
+    name: "{{ vars['smartctl_exporter_service'] }}"
+    state: "restarted"
+  when:
+    - "hostvars[inventory_hostname]['smartctl_exporter'] is defined"
+    - "hostvars[inventory_hostname]['smartctl_exporter'] != ''"
+    - "hostvars[inventory_hostname]['smartctl_exporter'] |
+       community.general.json_query(vars['smartctl_exporter_restart']) is
+       defined"
+    - "hostvars[inventory_hostname]['smartctl_exporter'] |
+       community.general.json_query(vars['smartctl_exporter_restart']) ==
+       'true'"
+  vars:
+    smartctl_exporter_restart: "[] | map(&restart || 'false', @) | [0]"

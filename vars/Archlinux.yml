@@ -1,0 +1,5 @@
+---
+smartctl_exporter_package:
+  - 'unzip'
+  - 'tar'
+  - 'smartmontools'

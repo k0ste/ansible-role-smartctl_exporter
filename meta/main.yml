@@ -1,0 +1,17 @@
+---
+galaxy_info:
+  role_name: "smartctl_exporter"
+  namespace: "none"
+  author: "Konstantin Shalygin <k0ste@k0ste.ru>"
+  issue_tracker_url: "https://github.com/k0ste/ansible-role-smartctl_exporter"
+  description: "Deploy Prometheus smartctl_exporter"
+  company: "YASB"
+  license: "GPL"
+  min_ansible_version: "3.0.0"
+  platforms:
+    - name: "Ubuntu"
+      versions:
+        - 'all'
+  galaxy_tags:
+    - 'system'
+dependencies: []

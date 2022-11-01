@@ -1,0 +1,62 @@
+{{ '## ' + 'smartctl_exporter.service' }}
+{{ '# ' + ansible_managed }}
+{{ '# ' + 'Do not edit manually' }}
+
+{{ '[Unit]' }}
+{{ 'Description=smartctl_exporter' }}
+{{ 'After=network.target' }}
+{{ 'Wants=network.target' }}
+
+{{ '[Service]' }}
+{{ 'Type=simple' }}
+{{ 'User=root' }}
+{{ 'Group=root' }}
+{{ 'ExecStart=' + vars['smartctl_exporter_dest'] + '/smartctl_exporter' -}}
+{% if vars['smartctl_exporter_settings'] is defined and
+  vars['smartctl_exporter_settings'] != '' %}
+{% for s in vars['smartctl_exporter_settings'] %}
+{% if s.smartctl_path is defined and s.smartctl_path != '' %}
+{{ ' \\' }}
+{{ '  --smartctl.path=' + s.smartctl_path -}}
+{% endif %}
+{% if s.smartctl_interval is defined and s.smartctl_interval != '' %}
+{{ ' \\' }}
+{{ '  --smartctl.interval=' + s.smartctl_interval -}}
+{% endif %}
+{% if s.smartctl_device is defined and s.smartctl_device != '' %}
+{% if s.smartctl_device is string %}
+{{ ' \\' }}
+{{ '  --smartctl.device=' + s.smartctl_device -}}
+{% elif s.smartctl_device is sequence %}
+{% for sd in s.smartctl_device %}
+{{  ' \\' }}
+{{ '  --smartctl.device=' + sd -}}
+{% endfor %}
+{% endif %}
+{% endif %}
+{% if s.web_listen_address is defined and s.web_listen_address != '' %}
+{{ ' \\' }}
+{{ '  --web.listen-address=' + s.web_listen_address -}}
+{% endif %}
+{% if s.web_telemetry_path is defined and s.web_telemetry_path != '' %}
+{{ ' \\' }}
+{{ '  --web.telemetry-path=' + s.web_telemetry_path -}}
+{% endif %}
+{% if s.log_level is defined and s.log_level != '' %}
+{{ ' \\' }}
+{{ '  --log.level=' + s.log_level -}}
+{% endif %}
+{% if s.log_format is defined and s.log_format in ['logfmt', 'json'] %}
+{{ ' \\' }}
+{{ '  --log.format=' + s.log_format -}}
+{% endif %}
+{% if loop.last %}
+{{ '' }}
+{% endif %}
+{% endfor %}
+{% else %}
+{{ '' }}
+{% endif %}
+
+{{ '[Install]' }}
+{{ 'WantedBy=multi-user.target' }}

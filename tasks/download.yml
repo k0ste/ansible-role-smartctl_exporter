@@ -1,0 +1,28 @@
+---
+- name: "smartctl_exporter | Download & unarchive exporter binary from tarball"
+  ansible.builtin.unarchive:
+    src: "{{ vars['smartctl_exporter_url'] + '/v' +
+      vars['smartctl_exporter_version'] + '/smartctl_exporter-' +
+      vars['smartctl_exporter_version'] + '.' + vars['smartctl_exporter_arch'] +
+      '.tar.gz' }}"
+    dest: "{{ vars['smartctl_exporter_dest'] }}"
+    remote_src: "yes"
+    include: "{{ 'smartctl_exporter-' + vars['smartctl_exporter_version'] +
+      '.' + vars['smartctl_exporter_arch'] + '/smartctl_exporter' }}"
+    mode: "0775"
+    owner: "root"
+    group: "root"
+- name: "smartctl_exporter | Move exporter binary arfter unarchive"
+  ansible.builtin.command:
+    cmd: "{{ 'mv ' + vars['smartctl_exporter_dest'] + '/smartctl_exporter-' +
+      vars['smartctl_exporter_version'] + '.' + vars['smartctl_exporter_arch'] +
+      '/smartctl_exporter ' + vars['smartctl_exporter_dest'] + '/' }}"
+    removes: "{{ vars['smartctl_exporter_dest'] + '/smartctl_exporter-' +
+      vars['smartctl_exporter_version'] + '.' + vars['smartctl_exporter_arch'] +
+      '/smartctl_exporter' }}"
+- name: "smartctl_exporter | Deleting unnecessary directory"
+  ansible.builtin.file:
+    path: "{{ vars['smartctl_exporter_dest'] + '/smartctl_exporter-' +
+      vars['smartctl_exporter_version'] + '.' + vars['smartctl_exporter_arch'] }}"
+    state: "absent"
+  diff: "false"
