@@ -21,6 +21,7 @@
     user: "prometheus-community"
     repo: "smartctl_exporter"
     action: "latest_release"
+  run_once: "true"
   register: "smartctl_exporter_version_tag"
   delegate_to: "localhost"
   when:
