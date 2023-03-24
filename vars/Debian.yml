@@ -1,5 +1,9 @@
 ---
-smartctl_exporter_package:
+smartctl_exporter_dest: '/opt/smartctl_exporter'
+smartctl_exporter_bin: '/usr/bin/smartctl_exporter'
+smartctl_exporter_service: 'smartctl_exporter'
+smartctl_exporter_package: 'smartctl_exporter'
+smartctl_exporter_packages_deps:
   - 'unzip'
   - 'tar'
   - 'smartmontools'

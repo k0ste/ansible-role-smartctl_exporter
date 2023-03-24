@@ -13,28 +13,90 @@
     smartctl_exporter_version:
       "{{ hostvars[inventory_hostname]['smartctl_exporter'] |
       community.general.json_query('[].version | [0]') | default(omit) }}"
+    smartctl_exporter_systemd_dir: "{{ '/etc/systemd/system/' +
+      hostvars[inventory_hostname]['smartctl_exporter_service'] +
+      '.service.d' }}"
     smartctl_exporter_settings:
       "{{ hostvars[inventory_hostname]['smartctl_exporter'] |
       community.general.json_query('[].settings | [0]') | default(omit) }}"
+    smartctl_exporter_package_state:
+      "{{ hostvars[inventory_hostname]['smartctl_exporter'] |
+      community.general.json_query('[].package_state | [0]') | default(omit) }}"
+- name: "smartctl_exporter | Assert that package state in valid value"
+  ansible.builtin.assert:
+    that:
+      - "vars['smartctl_exporter_package_state'] in ['present', 'latest']"
+    msg: "'package_state' must be in 'present' or 'latest'"
+    quiet: "true"
+  when:
+    - "vars['smartctl_exporter_package_state'] is defined"
+    - "vars['smartctl_exporter_package_state'] != ''"
 - name: "smartctl_exporter | Get last release version from Github"
   community.general.github_release:
     user: "prometheus-community"
     repo: "smartctl_exporter"
     action: "latest_release"
-  run_once: "true"
+  run_once: True
   register: "smartctl_exporter_version_tag"
   delegate_to: "localhost"
   when:
     - "vars['smartctl_exporter_version'] is defined"
     - "vars['smartctl_exporter_version'] == 'latest'"
+    - "hostvars[inventory_hostname]['smartctl_exporter'] is defined"
+    - "hostvars[inventory_hostname]['smartctl_exporter'] != ''"
+    - "hostvars[inventory_hostname]['smartctl_exporter'] |
+       community.general.json_query(vars['smartctl_exporter_install_package'])
+       is defined"
+    - "hostvars[inventory_hostname]['smartctl_exporter'] |
+       community.general.json_query(vars['smartctl_exporter_install_package'])
+       == 'false'"
+  vars:
+    smartctl_exporter_install_package: "[] |
+      map(&install_package || 'false', @) | [0]"
 - name: "smartctl_exporter | Set facts about smartctl_exporter role"
   ansible.builtin.set_fact:
+    smartctl_exporter_package_state: "present"
     smartctl_exporter_version:
       "{{ vars['smartctl_exporter_version_tag']['tag'][1:] }}"
+  when:
+    - "vars['smartctl_exporter_version_tag'] is defined"
+    - "vars['smartctl_exporter_version_tag'] != ''"
+- name: "smartctl_exporter | Create override systemd service directory"
+  ansible.builtin.file:
+    path: "{{ vars['smartctl_exporter_systemd_dir'] }}"
+    state: "directory"
+    group: "root"
+    owner: "root"
+    mode: "0755"
+    recurse: "no"
+  when:
+    - "hostvars[inventory_hostname]['smartctl_exporter'] is defined"
+    - "hostvars[inventory_hostname]['smartctl_exporter'] != ''"
+    - "hostvars[inventory_hostname]['smartctl_exporter'] |
+       community.general.json_query(vars['smartctl_exporter_install_package'])
+       is defined"
+    - "hostvars[inventory_hostname]['smartctl_exporter'] |
+       community.general.json_query(vars['smartctl_exporter_install_package'])
+       == 'true'"
+  vars:
+    smartctl_exporter_install_package: "[] |
+      map(&install_package || 'false', @) | [0]"
 - name: "smartctl_exporter | Create smartctl_exporter catalog"
   ansible.builtin.file:
-    path: "{{ vars['smartctl_exporter_dest'] }}"
+    path: "{{ hostvars[inventory_hostname]['smartctl_exporter_dest'] }}"
     state: "directory"
     owner: "root"
     group: "root"
     mode: "0755"
+  when:
+    - "hostvars[inventory_hostname]['smartctl_exporter'] is defined"
+    - "hostvars[inventory_hostname]['smartctl_exporter'] != ''"
+    - "hostvars[inventory_hostname]['smartctl_exporter'] |
+       community.general.json_query(vars['smartctl_exporter_install_package'])
+       is defined"
+    - "hostvars[inventory_hostname]['smartctl_exporter'] |
+       community.general.json_query(vars['smartctl_exporter_install_package'])
+       == 'false'"
+  vars:
+    smartctl_exporter_install_package: "[] |
+      map(&install_package || 'false', @) | [0]"

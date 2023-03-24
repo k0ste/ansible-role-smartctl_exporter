@@ -9,7 +9,7 @@ galaxy_info:
   license: "GPL"
   min_ansible_version: "3.0.0"
   platforms:
-    - name: "Ubuntu"
+    - name: "EL"
       versions:
         - 'all'
   galaxy_tags:

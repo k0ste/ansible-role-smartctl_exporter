@@ -2,17 +2,8 @@
 {{ '# ' + ansible_managed }}
 {{ '# Do not edit manually' }}
 
-{{ '[Unit]' }}
-{{ 'Description=smartctl_exporter' }}
-{{ 'After=network.target' }}
-{{ 'Wants=network.target' }}
-
 {{ '[Service]' }}
-{{ 'Type=simple' }}
-{{ 'User=root' }}
-{{ 'Group=root' }}
-{{ 'ExecStart=' + hostvars[inventory_hostname]['smartctl_exporter_dest'] +
-  '/smartctl_exporter' -}}
+{{ 'ExecStart=' + vars['smartctl_exporter_bin'] -}}
 {% if vars['smartctl_exporter_settings'] is defined and
   vars['smartctl_exporter_settings'] != '' %}
 {% for s in vars['smartctl_exporter_settings'] %}
@@ -22,6 +13,3 @@
 {% endif %}
 {% endfor %}
 {% endif %}
-
-{{ '[Install]' }}
-{{ 'WantedBy=multi-user.target' }}
