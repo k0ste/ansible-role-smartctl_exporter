@@ -3,6 +3,7 @@
 {{ '# Do not edit manually' }}
 
 {{ '[Service]' }}
+{{ 'ExecStart=' }}
 {{ 'ExecStart=' + vars['smartctl_exporter_bin'] -}}
 {% if vars['smartctl_exporter_settings'] is defined and
   vars['smartctl_exporter_settings'] != '' %}

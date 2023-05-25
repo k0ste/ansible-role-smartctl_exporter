@@ -3,7 +3,7 @@
   ansible.builtin.template:
     src: "smartctl_exporter_override.j2"
     dest: "{{ vars['smartctl_exporter_systemd_dir'] + '/' +
-      hostvars[inventory_hostname]['smartctl_exporter_service'] + '.service' }}"
+      hostvars[inventory_hostname]['smartctl_exporter_service'] + '.conf' }}"
     owner: "root"
     group: "root"
     mode: "0644"
