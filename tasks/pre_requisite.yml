@@ -60,7 +60,7 @@
       "{{ vars['smartctl_exporter_version_tag']['tag'][1:] }}"
   when:
     - "vars['smartctl_exporter_version_tag'] is defined"
-    - "vars['smartctl_exporter_version_tag'] != ''"
+    - "vars['smartctl_exporter_version_tag']['skipped'] != true"
 - name: "smartctl_exporter | Create override systemd service directory"
   ansible.builtin.file:
     path: "{{ vars['smartctl_exporter_systemd_dir'] }}"
