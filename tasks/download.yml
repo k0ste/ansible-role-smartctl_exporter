@@ -1,5 +1,6 @@
 ---
-- ansible.builtin.import_tasks:
+- name: "smartctl_exporter | Include packages tasks [for deps]"
+  ansible.builtin.import_tasks:
     file: "packages.yml"
   vars:
     smartctl_exporter_pacakges_variant:
@@ -32,4 +33,4 @@
       '/smartctl_exporter-' + vars['smartctl_exporter_version'] + '.' +
       vars['smartctl_exporter_arch'] }}"
     state: "absent"
-  diff: False
+  diff: false

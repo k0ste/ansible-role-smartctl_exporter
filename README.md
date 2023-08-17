@@ -32,10 +32,20 @@ smartctl_exporter:
       - smartctl_path: '/usr/bin/smartctl'
       # The interval between smarctl polls (default is 60s)
         smartctl_interval: '60s'
+      # The interval between rescanning for new/disappeared devices. If the
+      # interval is smaller than 1s no rescanning takes place. If any devices
+      # are configured with 'smartctl_device' also no rescanning takes place
+        smartctl_rescan: '10m'
       # The devices to monitor
         smartctl_device:
           - '/dev/sda'
           - '/dev/nvme0n1'
+      # Regexp of devices to exclude from automatic scanning,
+      # mutually exclusive to 'device_include'
+        device_exclude: '^/dev/bus/[0-9]+$'
+      # Regexp of devices to include from automatic scanning,
+      # mutually exclusive to 'device_exclude'
+        device_include: ''
       # Address to listen on for web interface and telemetry
         web_listen_address: ':9633'
       #  Path under which to expose metrics

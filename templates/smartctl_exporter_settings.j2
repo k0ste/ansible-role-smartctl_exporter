@@ -6,6 +6,10 @@
 {{ ' \\' }}
 {{ '  --smartctl.interval=' + s['smartctl_interval'] -}}
 {% endif %}
+{% if s['smartctl_rescan'] is defined and s['smartctl_rescan'] != '' %}
+{{ ' \\' }}
+{{ '  --smartctl.rescan=' + s['smartctl_rescan'] -}}
+{% endif %}
 {% if s['smartctl_device'] is defined and s['smartctl_device'] != '' %}
 {% if s['smartctl_device'] is string %}
 {{ ' \\' }}
@@ -13,17 +17,25 @@
 {% elif s['smartctl_device'] is sequence %}
 {% for sd in s['smartctl_device'] %}
 {{  ' \\' }}
-{{ '  --smartctl.device=' + sd -}}
+{{ '  --smartctl.device=\"' + sd + '\"' -}}
 {% endfor %}
 {% endif %}
 {% endif %}
-{% if s['web_listen_address'] is defined and s['web_listen_address'] != '' %}
+{% if s['device_exclude'] is defined and s['device_exclude'] != '' %}
 {{ ' \\' }}
-{{ '  --web.listen-address=' + s['web_listen_address'] -}}
+{{ '  --smartctl.device-exclude=\"' + s['device_exclude'] + '\"' -}}
+{% endif %}
+{% if s['device_include'] is defined and s['device_include'] != '' %}
+{{ ' \\' }}
+{{ '  --smartctl.device-include=\"' + s['device_include'] + '\"' -}}
 {% endif %}
 {% if s['web_telemetry_path'] is defined and s['web_telemetry_path'] != '' %}
 {{ ' \\' }}
 {{ '  --web.telemetry-path=' + s['web_telemetry_path'] -}}
+{% endif %}
+{% if s['web_listen_address'] is defined and s['web_listen_address'] != '' %}
+{{ ' \\' }}
+{{ '  --web.listen-address=' + s['web_listen_address'] -}}
 {% endif %}
 {% if s['log_level'] is defined and s['log_level'] != '' %}
 {{ ' \\' }}
@@ -33,4 +45,3 @@
 {{ ' \\' }}
 {{ '  --log.format=' + s['log_format'] -}}
 {% endif %}
-

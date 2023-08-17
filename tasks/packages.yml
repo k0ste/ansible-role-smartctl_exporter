@@ -1,24 +1,24 @@
 ---
 - name: "smartctl_exporter | Install the required packages in Redhat
     derivatives"
-  block:
-  - name: "smartctl_exporter | Install the required packages for RedHat via yum"
-    ansible.builtin.yum:
-      name: "{{ smartctl_exporter_pacakges_variant }}"
-      state: "{{ vars['smartctl_exporter_package_state'] |
-        default(omit) }}"
-      update_cache: "yes"
-    when:
-      - "hostvars[inventory_hostname]['ansible_pkg_mgr'] == 'yum'"
-  - name: "smartctl_exporter | Install the required packages for RedHat via dnf"
-    ansible.builtin.dnf:
-      name: "{{ smartctl_exporter_pacakges_variant }}"
-      state: "{{ vars['smartctl_exporter_package_state'] | default(omit) }}"
-      update_cache: "yes"
-    when:
-      - "hostvars[inventory_hostname]['ansible_pkg_mgr'] == 'dnf'"
   when:
     - "hostvars[inventory_hostname]['ansible_os_family'] == 'RedHat'"
+  block:
+    - name: "smartctl_exporter | Install the required packages for RedHat via yum"
+      ansible.builtin.yum:
+        name: "{{ smartctl_exporter_pacakges_variant }}"
+        state: "{{ vars['smartctl_exporter_package_state'] |
+          default(omit) }}"
+        update_cache: "yes"
+      when:
+        - "hostvars[inventory_hostname]['ansible_pkg_mgr'] == 'yum'"
+    - name: "smartctl_exporter | Install the required packages for RedHat via dnf"
+      ansible.builtin.dnf:
+        name: "{{ smartctl_exporter_pacakges_variant }}"
+        state: "{{ vars['smartctl_exporter_package_state'] | default(omit) }}"
+        update_cache: "yes"
+      when:
+        - "hostvars[inventory_hostname]['ansible_pkg_mgr'] == 'dnf'"
 - name: "smartctl_exporter | Install the required packages in Debian
     derivatives"
   ansible.builtin.apt:

@@ -1,6 +1,6 @@
 ---
 - name: "smartctl_exporter | Assert that system manager is systemd"
-  assert:
+  ansible.builtin.assert:
     that:
       - "hostvars[inventory_hostname]['ansible_service_mgr'] == 'systemd'"
     msg: "System manager is not systemd"
@@ -36,7 +36,7 @@
     user: "prometheus-community"
     repo: "smartctl_exporter"
     action: "latest_release"
-  run_once: True
+  run_once: true
   register: "smartctl_exporter_version_tag"
   delegate_to: "localhost"
   when:
@@ -60,7 +60,7 @@
       "{{ vars['smartctl_exporter_version_tag']['tag'][1:] }}"
   when:
     - "vars['smartctl_exporter_version_tag'] is defined"
-    - "vars['smartctl_exporter_version_tag']['skipped'] != true"
+    - "not vars['smartctl_exporter_version_tag']['skipped']"
 - name: "smartctl_exporter | Create override systemd service directory"
   ansible.builtin.file:
     path: "{{ vars['smartctl_exporter_systemd_dir'] }}"

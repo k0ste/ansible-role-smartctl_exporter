@@ -1,7 +1,9 @@
 ---
-- ansible.builtin.import_tasks:
+- name: "smartctl_exporter | Include pre requisite tasks"
+  ansible.builtin.import_tasks:
     file: "pre_requisite.yml"
-- ansible.builtin.import_tasks:
+- name: "smartctl_exporter | Include packages tasks [package deployment]"
+  ansible.builtin.import_tasks:
     file: "packages.yml"
   when:
     - "hostvars[inventory_hostname]['smartctl_exporter'] is defined"
@@ -17,7 +19,8 @@
       map(&install_package || 'false', @) | [0]"
     smartctl_exporter_pacakges_variant:
       "{{ hostvars[inventory_hostname]['smartctl_exporter_package'] }}"
-- ansible.builtin.import_tasks:
+- name: "smartctl_exporter | Include packages tasks [not package deployment]"
+  ansible.builtin.import_tasks:
     file: "download.yml"
   when:
     - "hostvars[inventory_hostname]['smartctl_exporter'] is defined"
@@ -31,5 +34,6 @@
   vars:
     smartctl_exporter_install_package: "[] |
       map(&install_package || 'false', @) | [0]"
-- ansible.builtin.include_tasks:
+- name: "smartctl_exporter | Include deployment tasks"
+  ansible.builtin.include_tasks:
     file: "deploy_smartctl_exporter.yml"
