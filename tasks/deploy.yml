@@ -1,9 +1,8 @@
 ---
-- name: "smartctl_exporter | Deploy smartctl_exporter service configuration"
+- name: "smartctl_exporter | Deploy smartctl_exporter options configuration"
   ansible.builtin.template:
-    src: "smartctl_exporter_override.j2"
-    dest: "{{ vars['smartctl_exporter_systemd_dir'] + '/' +
-      hostvars[inventory_hostname]['smartctl_exporter_service'] + '.conf' }}"
+    src: "smartctl_exporter.options.j2"
+    dest: "/etc/conf.d/smartctl_exporter"
     owner: "root"
     group: "root"
     mode: "0644"
@@ -20,7 +19,6 @@
     smartctl_exporter_install_package: "[] |
       map(&install_package || 'false', @) | [0]"
   notify:
-    - "Daemon reload"
     - "Restart smartctl_exporter"
 - name: "smartctl_exporter | Deploy smartctl_exporter service configuration"
   ansible.builtin.template:
