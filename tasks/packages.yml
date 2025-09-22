@@ -1,25 +1,37 @@
 ---
 - name: "smartctl_exporter | Install the required packages in Redhat
     derivatives"
-  ansible.builtin.dnf:
-    name: "{{ smartctl_exporter_pacakges_variant }}"
-    state: "{{ vars['smartctl_exporter_package_state'] | default(omit) }}"
-    update_cache: "yes"
   when:
     - "hostvars[inventory_hostname]['ansible_os_family'] == 'RedHat'"
+  block:
+    - name: "smartctl_exporter | Update dnf cache"
+      ansible.builtin.dnf:
+        update_cache: "yes"
+    - name: "smartctl_exporter | Install package with dnf"
+      ansible.builtin.dnf:
+        name: "{{ smartctl_exporter_pacakges_variant }}"
+        state: "{{ vars['smartctl_exporter_package_state'] | default(omit) }}"
 - name: "smartctl_exporter | Install the required packages in Debian
     derivatives"
-  ansible.builtin.apt:
-    name: "{{ smartctl_exporter_pacakges_variant }}"
-    state: "{{ vars['smartctl_exporter_package_state'] | default(omit) }}"
-    update_cache: "yes"
   when:
     - "hostvars[inventory_hostname]['ansible_os_family'] == 'Debian'"
+  block:
+    - name: "smartctl_exporter | Update apt cache"
+      ansible.builtin.apt:
+        update_cache: "yes"
+    - name: "smartctl_exporter | Install package with apt"
+      ansible.builtin.apt:
+        name: "{{ smartctl_exporter_pacakges_variant }}"
+        state: "{{ vars['smartctl_exporter_package_state'] | default(omit) }}"
 - name: "smartctl_exporter | Install the required packages in ArchLinux
     derivatives"
-  community.general.pacman:
-    name: "{{ smartctl_exporter_pacakges_variant }}"
-    state: "{{ vars['smartctl_exporter_package_state'] | default(omit) }}"
-    update_cache: "yes"
   when:
     - "hostvars[inventory_hostname]['ansible_os_family'] == 'Archlinux'"
+  block:
+    - name: "smartctl_exporter | Update pacman cache"
+      community.general.pacman:
+        update_cache: "yes"
+    - name: "smartctl_exporter | Install package with pacman"
+      community.general.pacman:
+        name: "{{ smartctl_exporter_pacakges_variant }}"
+        state: "{{ vars['smartctl_exporter_package_state'] | default(omit) }}"
