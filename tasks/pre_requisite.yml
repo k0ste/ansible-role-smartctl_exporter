@@ -1,44 +1,57 @@
 ---
+- name: "smartctl_exporter | Assert that ansible facts gathered successfully"
+  ansible.builtin.assert:
+    that:
+      - "hostvars[inventory_hostname]['ansible_facts']['service_mgr'] is
+        defined"
+    fail_msg: "'ansible_facts' not found. Please enable facts gathering"
+    quiet: "true"
 - name: "smartctl_exporter | Assert that system manager is systemd"
   ansible.builtin.assert:
     that:
-      - "hostvars[inventory_hostname]['ansible_service_mgr'] == 'systemd'"
+      - "hostvars[inventory_hostname]['ansible_facts']['service_mgr'] ==
+        'systemd'"
     fail_msg: "System manager is not systemd"
     quiet: "true"
-- name: "smartctl_exporter | Add the OS specific varibles"
+- name: "smartctl_exporter | Add the OS specific variables"
   ansible.builtin.include_vars:
-    file: "{{ hostvars[inventory_hostname]['ansible_os_family'] + '.yml' }}"
+    file: "{{ hostvars[inventory_hostname]['ansible_facts']['os_family'] +
+      '.yml' }}"
 - name: "smartctl_exporter | Set facts about smartctl_exporter role"
   ansible.builtin.set_fact:
     smartctl_exporter_version:
       "{{ hostvars[inventory_hostname]['smartctl_exporter'] |
-      community.general.json_query('[].version | [0]') | default(omit) }}"
+      community.general.json_query('[].version | [0]') }}"
     smartctl_exporter_settings:
       "{{ hostvars[inventory_hostname]['smartctl_exporter'] |
-      community.general.json_query('[].settings | [0]') | default(omit) }}"
+      community.general.json_query('[].settings | [0]') }}"
     smartctl_exporter_package_state:
       "{{ hostvars[inventory_hostname]['smartctl_exporter'] |
-      community.general.json_query('[].package_state | [0]') | default(omit) }}"
+      community.general.json_query('[].package_state | [0]') }}"
+  when:
+    - "hostvars[inventory_hostname]['smartctl_exporter'] is defined"
+    - "hostvars[inventory_hostname]['smartctl_exporter']
+      not in ['', [], '[]', None]"
 - name: "smartctl_exporter | Assert that smartctl_exporter package state in
     valid value"
   ansible.builtin.assert:
     that:
-      - "vars['smartctl_exporter_package_state'] in ['present', 'latest']"
-    fail_msg: "'package_state' must be in 'present' or 'latest'"
+      - "lookup('ansible.builtin.vars', 'smartctl_exporter_package_state') in
+        ['present', 'latest']"
+    fail_msg: "{{ 'package_state must be in `present` or `latest`,
+      current is: ' + lookup('ansible.builtin.vars',
+      'smartctl_exporter_package_state') }}"
     quiet: "true"
   when:
-    - "vars['smartctl_exporter_package_state'] is defined"
-    - "vars['smartctl_exporter_package_state'] != []"
-    - "vars['smartctl_exporter_package_state'] != ''"
-    - "vars['smartctl_exporter_package_state'] != None"
+    - "lookup('ansible.builtin.vars', 'smartctl_exporter_package_state',
+      default='') not in ['', [], '[]', None, 'present', 'latest']"
 - name: "smartctl_exporter | Set package state to 'present' cause value is not
     defined"
   ansible.builtin.set_fact:
     smartctl_exporter_package_state: "present"
   when:
-    - "vars['smartctl_exporter_package_state'] is defined"
-    - "(vars['smartctl_exporter_package_state'] == '' or
-      vars['smartctl_exporter_package_state'] == None)"
+    - "lookup('ansible.builtin.vars', 'smartctl_exporter_package_state',
+      default='') in ['', [], '[]', None]"
 - name: "smartctl_exporter | Get last release version from Github"
   community.general.github_release:
     user: "prometheus-community"
@@ -48,27 +61,27 @@
   register: "smartctl_exporter_version_tag"
   delegate_to: "localhost"
   when:
-    - "vars['smartctl_exporter_version'] is defined"
-    - "vars['smartctl_exporter_version'] == 'latest'"
+    - "lookup('ansible.builtin.vars', 'smartctl_exporter_version',
+      default='') == 'latest'"
     - "hostvars[inventory_hostname]['smartctl_exporter'] is defined"
-    - "hostvars[inventory_hostname]['smartctl_exporter'] != ''"
+    - "hostvars[inventory_hostname]['smartctl_exporter']
+      not in ['', [], '[]', None]"
     - "hostvars[inventory_hostname]['smartctl_exporter'] |
-       community.general.json_query(vars['smartctl_exporter_install_package'])
-       is defined"
-    - "hostvars[inventory_hostname]['smartctl_exporter'] |
-       community.general.json_query(vars['smartctl_exporter_install_package'])
-       == 'false'"
+       community.general.json_query(lookup('ansible.builtin.vars',
+      'smartctl_exporter_install_package', default='')) == 'false'"
   vars:
     smartctl_exporter_install_package: "[] |
       map(&install_package || 'false', @) | [0]"
 - name: "smartctl_exporter | Set facts about smartctl_exporter role"
   ansible.builtin.set_fact:
     smartctl_exporter_package_state: "present"
-    smartctl_exporter_version:
-      "{{ vars['smartctl_exporter_version_tag']['tag'][1:] }}"
+    smartctl_exporter_version: "{{ lookup('ansible.builtin.vars',
+      'smartctl_exporter_version_tag')['tag'][1:] }}"
   when:
-    - "vars['smartctl_exporter_version_tag'] is defined"
-    - "not vars['smartctl_exporter_version_tag']['skipped']"
+    - "lookup('ansible.builtin.vars', 'smartctl_exporter_version_tag',
+      default='') not in ['', [], '[]', None]"
+    - "not lookup('ansible.builtin.vars',
+      'smartctl_exporter_version_tag')['skipped']"
 - name: "smartctl_exporter | Create smartctl_exporter catalog"
   ansible.builtin.file:
     path: "{{ hostvars[inventory_hostname]['smartctl_exporter_dest'] }}"
@@ -78,13 +91,11 @@
     mode: "0755"
   when:
     - "hostvars[inventory_hostname]['smartctl_exporter'] is defined"
-    - "hostvars[inventory_hostname]['smartctl_exporter'] != ''"
+    - "hostvars[inventory_hostname]['smartctl_exporter']
+      not in ['', [], '[]', None]"
     - "hostvars[inventory_hostname]['smartctl_exporter'] |
-       community.general.json_query(vars['smartctl_exporter_install_package'])
-       is defined"
-    - "hostvars[inventory_hostname]['smartctl_exporter'] |
-       community.general.json_query(vars['smartctl_exporter_install_package'])
-       == 'false'"
+       community.general.json_query(lookup('ansible.builtin.vars',
+      'smartctl_exporter_install_package', default='')) == 'false'"
   vars:
     smartctl_exporter_install_package: "[] |
       map(&install_package || 'false', @) | [0]"

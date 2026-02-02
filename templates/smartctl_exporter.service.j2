@@ -17,22 +17,26 @@
 {{ 'Group=root' }}
 {{ 'ExecStart=' + hostvars[inventory_hostname]['smartctl_exporter_dest'] +
   '/smartctl_exporter' -}}
-{% if vars['smartctl_exporter_settings'] is defined and
-  vars['smartctl_exporter_settings'] != '' %}
-{% for s in vars['smartctl_exporter_settings'] %}
-{% if s['smartctl_path'] is defined and s['smartctl_path'] != '' %}
+{% if lookup('ansible.builtin.vars', 'smartctl_exporter_settings', default='')
+  not in ['', [], '[]', None] %}
+{% for s in lookup('ansible.builtin.vars', 'smartctl_exporter_settings') %}
+{% if s['smartctl_path'] is defined and s['smartctl_path']
+  not in ['', [], '[]', None] %}
 {{ ' \\' }}
 {{ '  --smartctl.path=' + s['smartctl_path'] -}}
 {% endif %}
-{% if s['smartctl_interval'] is defined and s['smartctl_interval'] != '' %}
+{% if s['smartctl_interval'] is defined and s['smartctl_interval']
+  not in ['', [], '[]', None] %}
 {{ ' \\' }}
 {{ '  --smartctl.interval=' + s['smartctl_interval'] -}}
 {% endif %}
-{% if s['smartctl_rescan'] is defined and s['smartctl_rescan'] != '' %}
+{% if s['smartctl_rescan'] is defined and s['smartctl_rescan']
+  not in ['', [], '[]', None] %}
 {{ ' \\' }}
 {{ '  --smartctl.rescan=' + s['smartctl_rescan'] -}}
 {% endif %}
-{% if s['smartctl_device'] is defined and s['smartctl_device'] != '' %}
+{% if s['smartctl_device'] is defined and s['smartctl_device']
+  not in ['', [], '[]', None] %}
 {% if s['smartctl_device'] is string %}
 {{ ' \\' }}
 {{ '  --smartctl.device=' + s['smartctl_device'] -}}
@@ -43,23 +47,28 @@
 {% endfor %}
 {% endif %}
 {% endif %}
-{% if s['device_exclude'] is defined and s['device_exclude'] != '' %}
+{% if s['device_exclude'] is defined and s['device_exclude']
+  not in ['', [], '[]', None] %}
 {{ ' \\' }}
 {{ '  --smartctl.device-exclude=\"' + s['device_exclude'] + '\"' -}}
 {% endif %}
-{% if s['device_include'] is defined and s['device_include'] != '' %}
+{% if s['device_include'] is defined and s['device_include']
+  not in ['', [], '[]', None] %}
 {{ ' \\' }}
 {{ '  --smartctl.device-include=\"' + s['device_include'] + '\"' -}}
 {% endif %}
-{% if s['web_telemetry_path'] is defined and s['web_telemetry_path'] != '' %}
+{% if s['web_telemetry_path'] is defined and s['web_telemetry_path']
+  not in ['', [], '[]', None] %}
 {{ ' \\' }}
 {{ '  --web.telemetry-path=' + s['web_telemetry_path'] -}}
 {% endif %}
-{% if s['web_listen_address'] is defined and s['web_listen_address'] != '' %}
+{% if s['web_listen_address'] is defined and s['web_listen_address']
+  not in ['', [], '[]', None] %}
 {{ ' \\' }}
 {{ '  --web.listen-address=' + s['web_listen_address'] -}}
 {% endif %}
-{% if s['log_level'] is defined and s['log_level'] != '' %}
+{% if s['log_level'] is defined and s['log_level']
+  not in ['', [], '[]', None] %}
 {{ ' \\' }}
 {{ '  --log.level=' + s['log_level'] -}}
 {% endif %}
